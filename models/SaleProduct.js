@@ -7,8 +7,10 @@ class SaleProduct extends ActiveRecord {
         super();
         this.SaleFolio = saleProduct?.SaleFolio;
         this.ProductFolio = saleProduct?.ProductFolio;
+        this.Assembly = saleProduct?.Assembly ?? null;
         this.Quantity = saleProduct?.Quantity;
         this.Percentage = saleProduct?.Percentage;
+        this.PricePerUnit = saleProduct?.PricePerUnit ?? null;
     }
 }
 
