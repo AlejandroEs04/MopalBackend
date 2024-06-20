@@ -99,6 +99,7 @@ class ActiveRecord {
         query += `${claves.map(clave => clave)}`
         query += `) VALUES `
         let i = 0;
+
         array?.map(product => {
             query += `${i === 0 ? '' : ','} (${claves.map(clave => getType(product[clave]))})`
             i++;

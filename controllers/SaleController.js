@@ -49,7 +49,8 @@ const addNewSale = async(req, res) => {
             Quantity : +sale.products[i].Quantity, 
             Percentage : +sale.products[i].Percentage ?? 0,
             PricePerUnit : +sale.products[i].PricePerUnit, 
-            Assembly : sale.products[i].Assembly
+            Assembly : sale.products[i].Assembly,
+            Observations : sale.products[i].Observations
         })
 
         if(+saleObj.StatusID === 2) {

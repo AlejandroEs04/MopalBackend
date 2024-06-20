@@ -10,7 +10,8 @@ class SaleProduct extends ActiveRecord {
         this.Assembly = saleProduct?.Assembly ?? null;
         this.Quantity = saleProduct?.Quantity;
         this.Percentage = saleProduct?.Percentage;
-        this.PricePerUnit = saleProduct?.PricePerUnit ?? null;
+        this.PricePerUnit = saleProduct?.PricePerUnit;
+        this.Observations = saleProduct?.Observations ?? null;
     }
 }
 
