@@ -42,15 +42,15 @@ const addNewSale = async(req, res) => {
 
     const productsArray = []
 
-    for(let i = 0; i < sale.products.length; i++) {
+    for(let i = 0; i < sale.Products.length; i++) {
         productsArray[i] = new SaleProduct({
             SaleFolio : response.response[0].insertId, 
-            ProductFolio : sale.products[i].Folio, 
-            Quantity : +sale.products[i].Quantity, 
-            Percentage : +sale.products[i].Percentage ?? 0,
-            PricePerUnit : +sale.products[i].PricePerUnit, 
-            Assembly : sale.products[i].Assembly,
-            Observations : sale.products[i].Observations
+            ProductFolio : sale.Products[i].Folio, 
+            Quantity : +sale.Products[i].Quantity, 
+            Percentage : +sale.Products[i].Percentage ?? 0,
+            PricePerUnit : +sale.Products[i].PricePerUnit, 
+            Assembly : sale.Products[i].Assembly,
+            Observations : sale.Products[i].Observations
         })
 
         if(+saleObj.StatusID === 2) {
@@ -98,19 +98,19 @@ const updateSale = async(req, res) => {
     const productoObj = new Product();
 
     if(+saleObj.StatusID >= 2) {
-        for(let i = 0;i < sale.products.length; i++) {
+        for(let i = 0;i < sale.Products.length; i++) {
             const sqlGetProducts = `
                 SELECT * FROM SaleProduct 
-                WHERE ProductFolio = '${sale.products[i].Folio}' AND SaleFolio = ${saleObj.Folio}
+                WHERE ProductFolio = '${sale.Products[i].Folio}' AND SaleFolio = ${saleObj.Folio}
             `
             const product = await saleProductObj.exectQueryInfo(sqlGetProducts);
     
             if(product.length === 0) {
                 const productNew = new SaleProduct({
                     SaleFolio : saleObj.Folio, 
-                    ProductFolio : sale.products[i].Folio, 
-                    Quantity : +sale.products[i].Quantity, 
-                    Percentage : +sale.products[i].Percentage ?? 0
+                    ProductFolio : sale.Products[i].Folio, 
+                    Quantity : +sale.Products[i].Quantity, 
+                    Percentage : +sale.Products[i].Percentage ?? 0
                 })
     
                 const resNewProduct = await saleProductObj.addOne(productNew)
@@ -119,7 +119,7 @@ const updateSale = async(req, res) => {
                     return res.status(500).json({status : 500, msg: "Hubo un error al agregar un producto"})
                 }
     
-                const productoOld = await productoObj.getByFolio(sale.products[i].Folio);
+                const productoOld = await productoObj.getByFolio(sale.Products[i].Folio);
     
                 const sqlUpdateStock = `
                     UPDATE Product 
@@ -135,16 +135,16 @@ const updateSale = async(req, res) => {
                     return res.status(500).json({status : 500, msg: "Hubo un error al actualizar los productos"})
                 }
             } else {
-                const QuantityNew = +sale.products[i].Quantity
-                const PercentageNew = +sale.products[i].Percentage
+                const QuantityNew = +sale.Products[i].Quantity
+                const PercentageNew = +sale.Products[i].Percentage
                 if(QuantityNew !== product[0].Quantity || PercentageNew !== product[0].Percentage) {
-                    const saleProduct = new SaleProduct(sale.products[i])
+                    const saleProduct = new SaleProduct(sale.Products[i])
     
                     const sqlUpdateSaleProducto = `
                         UPDATE SaleProduct 
                         SET Quantity = ${+QuantityNew},
                         Percentage = ${+PercentageNew}
-                        WHERE ProductFolio = '${sale.products[i].Folio}' AND SaleFolio = ${saleObj.Folio}
+                        WHERE ProductFolio = '${sale.Products[i].Folio}' AND SaleFolio = ${saleObj.Folio}
                     `
     
                     const resUpdateSaleProducto = saleProduct.exectQuery(sqlUpdateSaleProducto);
@@ -153,7 +153,7 @@ const updateSale = async(req, res) => {
                         return res.status(500).json({status : 500, msg: "Hubo un error al actualizar un producto"})
                     }
     
-                    const producto = await productoObj.getByFolio(sale.products[i].Folio);
+                    const producto = await productoObj.getByFolio(sale.Products[i].Folio);
     
                     const sqlUpdateStock = `
                         UPDATE Product 
@@ -172,7 +172,6 @@ const updateSale = async(req, res) => {
             }
         }
     }
-
 
     const response = await saleObj.updateOne(saleObj)
 

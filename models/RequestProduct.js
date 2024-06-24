@@ -5,11 +5,12 @@ class RequestProduct extends ActiveRecord {
 
     constructor(props) {
         super(props);
-        this.RequestID = props?.RequestID;
+        this.RequestID = +props?.RequestID;
         this.ProductFolio = props?.ProductFolio;
         this.Assembly = props?.Assembly ?? null;
-        this.Quantity = props?.Quantity;
-        this.Percentage = props?.Percentage ?? 100;
+        this.AssemblyGroup = +props?.AssemblyGroup ?? null
+        this.Quantity = +props?.Quantity;
+        this.Percentage = +props?.Percentage ?? 100;
     }
 }
 
