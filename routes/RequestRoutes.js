@@ -12,7 +12,7 @@ router.route('/:id')
     .get(checkAuth, getOneRequest)
     .put(checkAuth, acceptRequest)
     .delete(checkAuth, cancelRequest);
-router.get('/user/:userId', checkAuth, getUserRequest);
+router.get('/user/requests', checkAuth, getUserRequest);
 router.put('/status/:id', checkAuth, toggleStatus)
 
     

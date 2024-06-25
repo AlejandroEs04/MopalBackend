@@ -61,13 +61,13 @@ const getOneRequest = async(req, res) => {
 }
 
 const getUserRequest = async(req, res) => {
-    const { userId } = req.params
+    const { user } = req
 
     const requestObj = new RequestInfoView();
     const requestProducts = await new RequestProduct().getAll()
     const productObj = new ProductInfo()
 
-    const requests = await requestObj.getByElementArray('UserID', +userId);
+    const requests = await requestObj.getByElementArray('UserID', +user.ID);
 
     for(let i=0;i<requests.length;i++) {
         const products = requestProducts?.filter(product => product.RequestID === requests[i].ID)
@@ -86,6 +86,8 @@ const getUserRequest = async(req, res) => {
             status: 201, 
             requests
         })
+    } else {
+        console.log("Algo fallo")
     }
 }
 

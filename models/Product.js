@@ -6,7 +6,7 @@ class Product extends ActiveRecord {
     constructor(product) {
         super();
         this.Folio = product?.Folio;
-        this.ProductListID = product?.ProductListID;
+        this.Name = product?.Name;
         this.Description = product?.Description;
         this.ListPrice = product?.ListPrice;
         this.TypeID = product?.TypeID;
