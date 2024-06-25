@@ -44,13 +44,8 @@ const addNewSale = async(req, res) => {
 
     for(let i = 0; i < sale.Products.length; i++) {
         productsArray[i] = new SaleProduct({
-            SaleFolio : response.response[0].insertId, 
-            ProductFolio : sale.Products[i].Folio, 
-            Quantity : +sale.Products[i].Quantity, 
-            Percentage : +sale.Products[i].Percentage ?? 0,
-            PricePerUnit : +sale.Products[i].PricePerUnit, 
-            Assembly : sale.Products[i].Assembly,
-            Observations : sale.Products[i].Observations
+            ...sale.Products[i], 
+            SaleFolio : response.response[0].insertId
         })
 
         if(+saleObj.StatusID === 2) {
@@ -59,8 +54,8 @@ const addNewSale = async(req, res) => {
             const sqlUpdateStock = `
                 UPDATE Product 
                 SET 
-                    StockAvaible = ${+productoOld.StockAvaible - +productsArray[i].Quantity}, 
-                    StockOnHand = ${+productoOld.StockOnHand + +productsArray[i].Quantity}
+                    StockAvaible = ${productoOld.StockAvaible - productsArray[i].Quantity}, 
+                    StockOnHand = ${productoOld.StockOnHand + productsArray[i].Quantity}
                 WHERE Folio = '${productsArray[i].ProductFolio}'
             `
 
@@ -124,8 +119,8 @@ const updateSale = async(req, res) => {
                 const sqlUpdateStock = `
                     UPDATE Product 
                     SET 
-                        StockAvaible = ${+productoOld.StockAvaible - +productNew.Quantity}, 
-                        StockOnHand = ${+productoOld.StockOnHand + +productNew.Quantity}
+                        StockAvaible = ${productoOld.StockAvaible - productNew.Quantity}, 
+                        StockOnHand = ${productoOld.StockOnHand + productNew.Quantity}
                     WHERE Folio = '${productNew.ProductFolio}'
                 `
     
@@ -357,7 +352,7 @@ const changeStatus = async(req, res) => {
         for(let i=0; i<products.length; i++) {
             const product = await productObj.getByFolio(products[i].ProductFolio);
     
-            const res = await productObj.updateOneColumn(product.Folio, 'StockOnHand', (product.StockOnHand - products[i].Quantity))
+            const res = await productObj.updateOneColumn(product.Folio, 'StockOnHand', (+product.StockOnHand - +products[i].Quantity))
             
             if(!res) {
                 return res.status(500).json({

@@ -60,6 +60,7 @@ const addNewProduct = async(req, res) => {
         }
 
         const response = await productObj.addMany(productsArray);
+
         if(response) {
             return res.status(200).json({
                 status : 200, 
@@ -127,12 +128,11 @@ const updateProduct = async(req, res) => {
     const { product } = req.body;
 
     const productObj = new Product(product)
-    
     const response = await productObj.updateOne(productObj);
 
-    console.log(productObj)
-
     if(response) {
+        io.emit('productsUpdate')
+
         return res.status(200).json({
             status : 200, 
             msg: "Se actualizo el producto correctamente", 
@@ -183,9 +183,37 @@ const addProductAccesory = async(req, res) => {
     const response = await DetProAccObj.addMany(accesories);
 
     if(response) {
+        io.emit('productsUpdate')
+
         return res.status(201).json({
             status : 201,
             msg : "Accesorio agregado correctamente"
+        })
+    } else {
+        return res.status(500).json({
+            status : 500, 
+            msg : "Hubo un error, por favor intentelo mas tarde"
+        })
+    }
+}
+
+const deleteProductAccesory = async(req, res) => {
+    const { folio, accesoryFolio } = req.params
+    const DetProAccObj = new DetProAcc()
+
+    const sql = `
+        DELETE FROM DetProAcc
+        WHERE 
+            ProductFolio = '${folio}' AND
+            AccessoryFolio = '${accesoryFolio}'
+    `
+
+    if(await DetProAccObj.exectQuery(sql)) {
+        io.emit('productsUpdate')
+        
+        return res.status(201).json({
+            status : 201,
+            msg : "Accesorio eliminado correctamente"
         })
     } else {
         return res.status(500).json({
@@ -202,5 +230,6 @@ export {
     deleteProduct, 
     addProductInfo, 
     activateProduct, 
-    addProductAccesory
+    addProductAccesory, 
+    deleteProductAccesory
 }
