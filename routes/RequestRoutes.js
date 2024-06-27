@@ -1,8 +1,10 @@
 import express from 'express'
+import multer from 'multer';
 import checkAuth from '../middleware/checkAuth.js';
 import { acceptRequest, addNewRequest, cancelRequest, getAllRequest, getOneRequest, getUserRequest, toggleStatus } from '../controllers/RequestController.js';
 
 const router = express.Router();
+const upload = multer();
 
 router.route('/')
     .get(checkAuth, getAllRequest)

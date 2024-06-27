@@ -18,6 +18,7 @@ import RolRoutes from './routes/RolRoutes.js';
 import RequestRoutes from './routes/RequestRoutes.js';
 import ContactRoutes from './routes/ContactRoutes.js';
 import ReportRoutes from './routes/ReportRoutes.js'
+import SendEmail from './routes/SendEmailRoutes.js'
 
 dotenv.config();
 
@@ -60,6 +61,7 @@ app.use('/api/roles', RolRoutes);
 app.use('/api/request', RequestRoutes);
 app.use('/api/contact', ContactRoutes);
 app.use('/api/report', ReportRoutes);
+app.use('/api/sendEmail', SendEmail);
 
 const server = createServer(app);
 

@@ -1,5 +1,5 @@
 import { configDotenv } from "dotenv";
-import { requestAcepted, requestCanceled, requestEmail } from "../helpers/email.js";
+import { quotationSend, requestAcepted, requestCanceled, requestEmail } from "../helpers/email.js";
 import { io } from "../index.js";
 import Request from "../models/Request.js"
 import RequestInfoView from "../models/RequestInfoView.js";
@@ -149,7 +149,7 @@ const addNewRequest = async(req, res) => {
 
         return res.status(200).json({
             status : 200, 
-            msg: "Solicitud generada con exito"
+            msg: requestObj.ActionID === 1 ? "Cotizacion generada con exito" : "Solicitud generada con exito"
         })
     } else {
         return res.status(500).json({status : 500, msg: "Hubo un error al generar la solicitud, por favor, intentelo mas tarde"})
@@ -164,8 +164,6 @@ const acceptRequest = async(req, res) => {
     const productObj = new Product();
     const requestProductsObj = new RequestProduct();
 
-    const request = await requestObj.getByID(id);
-
     const requestProduct = await requestProductsObj.getByElementArray('RequestID', +id);
 
     if(edited) {
@@ -178,7 +176,8 @@ const acceptRequest = async(req, res) => {
                         ProductFolio = '${productNewObj.ProductFolio}', 
                         Assembly = '${productNewObj.Assembly}',
                         Quantity = ${productNewObj.Quantity}, 
-                        Percentage = ${productNewObj.Percentage} 
+                        PricePerUnit = ${productNewObj.PricePerUnit}, 
+                        Percentage = ${productNewObj.Percentage}
                 WHERE RequestID = ${productNewObj.RequestID}
             `
 
@@ -213,17 +212,31 @@ const acceptRequest = async(req, res) => {
         }
     }
     
-    const response = await requestObj.updateOneColumn(+id, 'Status', 2)
+    let response
 
     const reqUser = await requestObj.getByElement('ID', +id);
     const userObj = new UserInfo();
     const user = await userObj.getByElement('ID', reqUser.UserID)
-    
-    /**await requestAcepted({
-        FullName : user.FullName, 
-        Email : user.Email, 
-        product : requestProduct
-    })*/
+
+    switch (+requestOld.ActionID) {
+        case 1 : 
+            response = await requestObj.updateOneColumn(+id, 'Status', 5) 
+            break;
+
+        case 2 :
+            response = await requestObj.updateOneColumn(+id, 'Status', 2) 
+
+            await requestAcepted({
+                FullName : user.FullName, 
+                Email : user.Email, 
+                products : requestOld.products
+            })
+            break;
+        
+        default : 
+            console.log('Hay un error');
+            break;
+    }
 
     if(response) {
         io.emit('requestUpdate', { msg: "Ok" })

@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer'
+import formatearDinero from './formatearDinero.js';
 
 export const emailCreateUser = async(datos) => {
     const { email, fullName, userName, password } = datos;
@@ -154,8 +155,8 @@ export const requestEmail = async(datos) => {
     }
 }
 
-export const requestAcepted = async(datos) => {
-    const { FullName, Email, productFolio, quantity } = datos;
+export const quotationSend = async(datos) => {
+    const { FullName, Email, products, pdfBuffer } = datos;
 
     var transport = nodemailer.createTransport({
         host: process.env.EMAIL_HOST,
@@ -166,13 +167,39 @@ export const requestAcepted = async(datos) => {
         }
     });
 
-    const msgHtml = `
-        <div style="font-family: 'Roboto', sans-serif; background-color: #f5f5f5; padding: 15px 30px; border-radius: 5px;">
-            <h2 style="margin: 4px;">Hola ${FullName}, su solicitud ha sido <span style="color: #508FEB; text-transform: uppercase;">aceptada</span></h2>
+    let msgHtml = `
+        <div style="font-family: 'Roboto', sans-serif; padding: 15px 30px; border-radius: 5px;">
+            <h2 style="margin: 4px;">Estimado ${FullName}, aqui se presenta a continuacion la informacion de la cotizacion</h2>
             <br/>
-            <p style="margin: 4px; font-size: 18px;">Se ha realizado con exito la solicitud, a continuacion de presenta la informacion de la misma</p>
-            <p style="margin: 4px; font-size: 18px;">Folio del producto: <span style="font-weight: bold; color: #0a1a41;">${productFolio}</span></p>
-            <p style="margin: 4px; font-size: 18px;">Cantidad solicitada: <span style="font-weight: bold; color: #0a1a41;">${quantity}</span></p>
+            <table style="width: 100%; border-spacing: 0; font-size: 15px; margin-top: 15px;">
+                <thead style="background-color: #3f3f3f; color: white;">
+                    <tr>
+                        <th style="text-align: start; padding: 0.3em;">Cant.</th>
+                        <th style="text-align: start; padding: 0.3em;">Unid.</th>
+                        <th style="text-align: start; padding: 0.3em;">Clave</th>
+                        <th style="text-align: start; padding: 0.3em;">Valor Unit.</th>
+                        <th style="text-align: start; padding: 0.3em;">Importe</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+    `
+
+    for(let i = 0; i<products.length;i++) {
+        msgHtml += `
+            <tr>
+                <td style="vertical-align: top; padding: 0.3em; text-align: start;">${products[i].Quantity}</td>
+                <td style="vertical-align: top; padding: 0.3em; text-align: start;">Pieza</td>
+                <td style="vertical-align: top; padding: 0.3em; text-align: start;">${products[i].ProductFolio}</td>
+                <td style="vertical-align: top; padding: 0.3em; text-align: start;">${formatearDinero(+products[i].PricePerUnit)}</td>
+                <td style="vertical-align: top; padding: 0.3em; text-align: start;">${formatearDinero(+products[i].PricePerUnit * +products[i].Quantity)}</td>
+            </tr>
+        `
+    }
+
+    msgHtml += `
+                </tbody>
+            </table>
 
             <div style="display: flex; gap: 5px; margin-top: 15px;">
                 <p style="margin: 4px; font-size: 18px;">
@@ -188,7 +215,85 @@ export const requestAcepted = async(datos) => {
 
     try {
         await transport.sendMail({
-            from: "Mopal Grupo <cotizaciones@mopalgrupo.com>", 
+            from: "Mopal Grupo <solicitudes@mopalgrupo.com>", 
+            to: Email, 
+            subject: "Informacion de su cotizacion", 
+            text: "Se envia la informacion de su cotizacion y su pdf", 
+            attachments: [
+                {
+                    filename: 'cotizacion.pdf', 
+                    content: pdfBuffer
+                }
+            ],
+            html: msgHtml, 
+        });
+    } catch (error) {
+        console.log("Aqui" + error)
+    }
+}
+
+export const requestAcepted = async(datos) => {
+    const { FullName, Email, products } = datos;
+
+    var transport = nodemailer.createTransport({
+        host: process.env.EMAIL_HOST,
+        port: process.env.EMAIL_PORT,
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS
+        }
+    });
+
+    let msgHtml = `
+        <div style="font-family: 'Roboto', sans-serif; padding: 15px 30px; border-radius: 5px;">
+            <h2 style="margin: 4px;">Estimado ${FullName}, su solicitud ha sido <span style="color: #508FEB; text-transform: uppercase;">aceptada</span></h2>
+            <br/>
+            <p style="margin: 4px; font-size: 18px;">Se ha realizado con exito la solicitud, a continuacion de presenta la informacion de la misma</p>
+            <table style="width: 100%; border-spacing: 0; font-size: 15px; margin-top: 15px;">
+                <thead style="background-color: #3f3f3f; color: white;">
+                    <tr>
+                        <th style="text-align: start; padding: 0.3em;">Cant.</th>
+                        <th style="text-align: start; padding: 0.3em;">Unid.</th>
+                        <th style="text-align: start; padding: 0.3em;">Clave</th>
+                        <th style="text-align: start; padding: 0.3em;">Valor Unit.</th>
+                        <th style="text-align: start; padding: 0.3em;">Importe</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+    `
+
+    for(let i = 0; i<products.length;i++) {
+        msgHtml += `
+            <tr>
+                <td style="vertical-align: top; padding: 0.3em; text-align: start;">${products[i].Quantity}</td>
+                <td style="vertical-align: top; padding: 0.3em; text-align: start;">Pieza</td>
+                <td style="vertical-align: top; padding: 0.3em; text-align: start;">${products[i].ProductFolio}</td>
+                <td style="vertical-align: top; padding: 0.3em; text-align: start;">${formatearDinero(+products[i].PricePerUnit)}</td>
+                <td style="vertical-align: top; padding: 0.3em; text-align: start;">${formatearDinero(+products[i].PricePerUnit * +products[i].Quantity)}</td>
+            </tr>
+        `
+    }
+
+    msgHtml += `
+                </tbody>
+            </table>
+
+            <div style="display: flex; gap: 5px; margin-top: 15px;">
+                <p style="margin: 4px; font-size: 18px;">
+                    En caso de necesitar informacion, por favor comuniquese con nosotros a travez de esta liga: 
+                    <a 
+                        href="${process.env.FRONTEND_URL}/contacto" 
+                        style="text-decoration: none; text-transform: uppercase; border: none; font-size: 16px; border-radius: 5px;"
+                    >Aqui</a>
+                </p>
+            </div>
+        </div>
+    `
+
+    try {
+        await transport.sendMail({
+            from: "Mopal Grupo <solicitudes@mopalgrupo.com>", 
             to: Email, 
             subject: "Se ha aceptado su solicitud", 
             text: "Se ha aceptado con exito la solicitud de su producto", 

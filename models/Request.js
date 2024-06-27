@@ -10,6 +10,7 @@ class Request extends ActiveRecord {
         this.UserID = request?.UserID;
         this.Status = request?.Status ?? 1;
         this.CreationDate = request?.CreationDate ?? formatearFecha(Date.now());
+        this.ActionID = request?.actionID;
     }
 }
 

@@ -95,7 +95,7 @@ const updateUser = async(req, res) => {
 
     const oldUser = await userObj.getByID(user.ID);
 
-    if(user.Password !== '') {
+    if(user.Password) {
         await emailUpdateUser({
             email: user.Email, 
             fullName: user.LastName + " " + user.Name, 
@@ -106,9 +106,6 @@ const updateUser = async(req, res) => {
     } else {
         userObj.Password = oldUser.Password
     }
-
-    userObj.Name === user?.Name !== "" ? user.Name : oldUser.Name
-
     const response = await userObj.updateOne(userObj);
 
     if(response) {

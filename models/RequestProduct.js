@@ -10,6 +10,7 @@ class RequestProduct extends ActiveRecord {
         this.Assembly = props?.Assembly ?? null;
         this.AssemblyGroup = +props?.AssemblyGroup ?? null
         this.Quantity = +props?.Quantity;
+        this.PricePerUnit = +props?.PricePerUnit;
         this.Percentage = +props?.Percentage ?? 100;
     }
 }
